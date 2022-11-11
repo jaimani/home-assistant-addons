@@ -19,17 +19,18 @@ https://github.com/jaimani/home-assistant-addons
 ## Add-ons provided by this repository
 
 ### [Oru][addon-oru]
+
 Retrieving the last meter read from Orange and Rockland Utility or ConEdison and publish the data via MQTT
 
 ## Releases
 
 Releases are based on [Semantic Versioning][semver], and use the format
-of ``MAJOR.MINOR.PATCH``. In a nutshell, the version will be incremented
+of `MAJOR.MINOR.PATCH`. In a nutshell, the version will be incremented
 based on the following:
 
-- ``MAJOR``: Incompatible or major changes.
-- ``MINOR``: Backwards-compatible new features and enhancements.
-- ``PATCH``: Backwards-compatible bugfixes and package updates.
+- `MAJOR`: Incompatible or major changes.
+- `MINOR`: Backwards-compatible new features and enhancements.
+- `PATCH`: Backwards-compatible bugfixes and package updates.
 
 ## Support
 
@@ -50,7 +51,7 @@ on the correct GitHub repository matching the add-on.
 
 MIT License
 
-Copyright (c) 2022-2020 Bogdan Vlaicu
+Copyright (c) 2022 Jai Mani
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

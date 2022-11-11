@@ -1,2 +1,5 @@
 oru/coned_/
 test/
+.env
+meter*.png
+__pycache__

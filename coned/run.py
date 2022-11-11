@@ -8,6 +8,8 @@ import logging
 import time
 from datetime import datetime
 
+
+
 print(f"Creating Meter")
 
 meter = Meter(
@@ -17,10 +19,9 @@ meter = Meter(
     mfa_secret=os.getenv("MFA_SECRET"),
     account_uuid=os.getenv("ACCOUNT_UUID"),
     meter_number=os.getenv("METER_NUMBER"),
-    account_number=os.getenv("ACCOUNT_NUMBER"),
     site=os.getenv("SITE"),
-    browser_path="/usr/bin/chromium-browser"
-    # browser_path="/usr/bin/google-chrome-stable"
+    #browser_path="/usr/bin/chromium-browser"
+    browser_path="/usr/local/bin/chromium"
 )
 # meter._LOGGER.setLevel(logging.DEBUG)
 
