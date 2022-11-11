@@ -13,7 +13,7 @@ In the Home Assistant add-on store, a possibility to add a repository is provide
 Use the following URL to add this repository:
 
 ```txt
-https://github.com/bvlaicu/home-assistant-addons
+https://github.com/jaimani/home-assistant-addons
 ```
 
 ## Add-ons provided by this repository
@@ -61,7 +61,7 @@ on the correct GitHub repository matching the add-on.
 
 MIT License
 
-Copyright (c) 2019-2020 Bogdan Vlaicu
+Copyright (c) 2022-2020 Bogdan Vlaicu
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -81,10 +81,4 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-
-[addon-dashcast]: https://github.com/bvlaicu/home-assistant-addons/tree/master/dashcast
-[addon-meter-reader]: https://github.com/bvlaicu/home-assistant-addons/tree/master/meter-reader
-[addon-minidlna]: https://github.com/bvlaicu/home-assistant-addons/tree/master/minidlna
-[addon-rtlamr]: https://github.com/bvlaicu/home-assistant-addons/tree/master/rtlamr
-[addon-oru]: https://github.com/bvlaicu/home-assistant-addons/tree/master/oru
-[addon-php]: https://github.com/bvlaicu/home-assistant-addons/tree/master/php
+[addon-oru]: https://github.com/jaimani/home-assistant-addons/tree/master/oru
