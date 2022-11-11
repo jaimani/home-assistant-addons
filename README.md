@@ -18,19 +18,8 @@ https://github.com/jaimani/home-assistant-addons
 
 ## Add-ons provided by this repository
 
-
-### [Dashcast][addon-dashcast]
-Display dashboard web pages on your Chromecast device
-### [Meter Reader][addon-meter-reader]
-Put a webcam in front of your utility meter and AWS Rekognition sends the reading over MQTT to a MQTT server of your choice
-### [MiniDLNA][addon-minidlna]
-MiniDLNA server serving web content from the /data persistent volume
-### [RTLAMR][addon-rtlamr]
-Listen for 433MHz RF transmissions of utility meterss and publish the data via MQTT
 ### [Oru][addon-oru]
 Retrieving the last meter read from Orange and Rockland Utility or ConEdison and publish the data via MQTT
-### [PHP][addon-php]
-PHP server serving web content from the /data persistent volume
 
 ## Releases
 
