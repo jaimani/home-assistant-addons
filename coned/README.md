@@ -8,17 +8,18 @@ Add-on configuration example:
 
 ```yaml
 email: example@email.com
-password: '!secret oru_password'
+password: "!secret oru_password"
 mfa_type: TOTP
-mfa_secret: '!secret oru_mfa_secret'
+mfa_secret: "!secret oru_mfa_secret"
 account_uuid: ef788d65-5380-11e8-8211-2655115779ac
 meter_number: 706438804
 account_number: 004352784609234
 site: oru
 mqtt_host: hassio.local
 mqtt_user: mqtt
-mqtt_password: '!secret mqtt_password'
+mqtt_password: "!secret mqtt_password"
 ```
+
 ### Option: `email`
 
 The email address for the oru.com / coned.com account
@@ -45,7 +46,7 @@ Login to your account and go to
 -> Billing and Usage
 -> Your Billing and Usage
 -> Real Time usage
--> In browser developer tools, search for URL like : ```https://oru.opower.com/ei/edge/apis/cws-real-time-ami-v1/cws/oru/accounts/<YOUR_ACCOUNT_UUID>/meters/<YOUR_METER_NUMBER>/usage```
+-> In browser developer tools, search for URL like : `https://oru.opower.com/ei/edge/apis/cws-real-time-ami-v1/cws/oru/accounts/<YOUR_ACCOUNT_UUID>/meters/<YOUR_METER_NUMBER>/usage`
 
 Copy your UUID from the URl and paste it in this config
 
@@ -72,7 +73,6 @@ Defines the username for the MQTT server
 ### Option: `mqtt_password`
 
 Defines the password for the MQTT server
-
 
 ## MQTT Data
 
@@ -105,7 +105,7 @@ mqtt:
     name: "ConEd Energy Usage"
     unique_id: "coned_energy"
     state_topic: "electric_meter/value"
-    unit_of_measurement: 'kWh'
+    unit_of_measurement: "kWh"
     device_class: energy
     state_class: measurement
 

@@ -20,8 +20,8 @@ meter = Meter(
     account_uuid=os.getenv("ACCOUNT_UUID"),
     meter_number=os.getenv("METER_NUMBER"),
     site=os.getenv("SITE"),
-    #browser_path="/usr/bin/chromium-browser"
-    browser_path="/usr/local/bin/chromium"
+    browser_path="/usr/bin/chromium-browser"
+    #browser_path="/usr/local/bin/chromium"
 )
 # meter._LOGGER.setLevel(logging.DEBUG)
 
