@@ -3,3 +3,7 @@ test/
 .env
 meter*.png
 __pycache__
+*workspace
+.devcontainer.json
+.vscode
+.DS_Store

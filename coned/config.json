@@ -1,27 +1,21 @@
 {
-  "name": "Orange and Rockland Utility to MQTT Bridge",
-  "version": "1.0.2",
-  "slug": "oru",
-  "description": "Orange and Rockland Utility meter reading to MQTT",
-  "url": "https://github.com/bvlaicu/home-assistant-addons/tree/master/oru",
+  "name": "ConEd Utility to MQTT Bridge",
+  "version": "1.0.5",
+  "slug": "coned",
+  "description": "ConEd Utility meter reading to MQTT",
+  "url": "https://github.com/jaimani/home-assistant-addons/tree/master/coned",
   "panel_icon": "mdi:chart-areaspline",
   "startup": "application",
   "homeassistant": "0.92.0b2",
   "boot": "auto",
   "map": ["share:rw", "ssl"],
   "host_network": "False",
-  "arch": [
-    "aarch64",
-    "amd64",
-    "armv7",
-    "i386"
-  ],
+  "arch": ["aarch64", "amd64", "armv7", "i386"],
   "hassio_api": true,
   "auth_api": true,
   "hassio_role": "default",
   "homeassistant_api": false,
-  "options":
-  {
+  "options": {
     "email": "",
     "password": "",
     "mfa_type": "",
@@ -34,8 +28,7 @@
     "mqtt_user": "",
     "mqtt_password": ""
   },
-  "schema":
-  {
+  "schema": {
     "email": "str",
     "password": "str",
     "mfa_type": "str",
@@ -47,5 +40,5 @@
     "mqtt_host": "str",
     "mqtt_user": "str",
     "mqtt_password": "str"
-   }
+  }
 }

@@ -18,7 +18,7 @@ https://github.com/jaimani/home-assistant-addons
 
 ## Add-ons provided by this repository
 
-### [Oru][addon-oru]
+### [coned][addon-coned]
 
 Retrieving the last meter read from Orange and Rockland Utility or ConEdison and publish the data via MQTT
 
@@ -71,4 +71,4 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-[addon-oru]: https://github.com/jaimani/home-assistant-addons/tree/master/oru
+[addon-coned]: https://github.com/jaimani/home-assistant-addons/tree/master/coned

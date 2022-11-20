@@ -1,8 +1,7 @@
 """ConEdison or Orange and Rockland Utility Smart Energy Meter"""
-import requests
+from time import sleep
 import logging
-import asyncio
-from pyppeteer import launch
+from playwright.sync_api import sync_playwright, expect, TimeoutError as PlaywrightTimeoutError
 import os
 import glob
 import json
@@ -25,7 +24,7 @@ class Meter(object):
         meter_number: A string representing the meter number
         site: Optional. Either `coned` (default, for ConEdison) or `oru` (for Orange and Rockland Utility)
         loop: Optional. Specific event loop if needed. Defaults to creating the event loop.
-        browser_path: Optional. Specific chromium browser installation. Default to the installation that comes with pyppeteer.
+        account_number: Optional. For people who have multiple meters on a single account.
     """
 
     MFA_TYPE_SECURITY_QUESTION = 'SECURITY_QUESTION'
@@ -85,19 +84,18 @@ class Meter(object):
         self.loop = loop
         self._LOGGER.debug("loop = %s", self.loop)
 
-        self.browser_path = browser_path
-        self._LOGGER.debug("browser_path = %s", self.browser_path)
-
-    async def all_reads(self):
+    def all_reads(self):
         """Return all available meter read values and unit of measurement"""
         try:
-            asyncio.set_event_loop(self.loop)
-            asyncio.get_event_loop().create_task(self.browse())
-            await self.browse()
+            raw_data = self.browse()
 
+            if raw_data is None:
+                self._LOGGER.debug("failed retrieving the usage data, trying again... in 5 minutes")
+                sleep(300)
+                self.browse()
             # parse the return reads and extract the most recent one
             # (i.e. last not None)
-            jsonResponse = json.loads(self.raw_data)
+            jsonResponse = json.loads(raw_data)
 
             availableReads = []
             if 'error' in jsonResponse:
@@ -117,18 +115,17 @@ class Meter(object):
                 parsed_reads.append(this_parsed_read)
                 self._LOGGER.info("got read = %s %s %s %s", this_parsed_read['start_time'], this_parsed_read['end_time'],
                     this_parsed_read['value'], this_parsed_read['unit_of_measurement'])
-
             return parsed_reads
         except:
             raise MeterError("Error requesting meter data")
 
-    async def last_read(self):
+    def last_read(self):
         """Return the last meter read value and unit of measurement"""
-        all_available_reads = await self.all_reads()
+        all_available_reads = self.all_reads()
         last_read = all_available_reads[-1]
         return last_read['start_time'], last_read['end_time'], last_read['value'], last_read['unit_of_measurement']
 
-    async def browse(self):
+    def browse(self):
         screenshotFiles = glob.glob('meter*.png')
         for filePath in screenshotFiles:
             try:
@@ -136,121 +133,64 @@ class Meter(object):
             except:
                 self._LOGGER.debug("Error while deleting file : ", filePath)
 
-
-        browser_launch_config = {
-            "defaultViewport": {"width": 1920, "height": 1080},
-            "dumpio": True,
-            "args": ["--no-sandbox", "--disable-gpu", "--disable-software-rasterizer"]}
-        if self.browser_path is not None:
-            browser_launch_config['executablePath'] = self.browser_path
-        self._LOGGER.debug("browser_launch_config = %s", browser_launch_config)
-
-        browser = await launch(browser_launch_config)
-        page = await browser.newPage()
-
-        # page.on('request', lambda req: asyncio.ensure_future(request_interception(req)))
-        # page.on('response', lambda res: asyncio.ensure_future(resp(res)))
-
-        await page.goto('https://www.' + self.site + '.com/en/login', {'waitUntil': 'domcontentloaded', 'timeout': 10000})
-        # sleep = 8000
-        # self._LOGGER.debug("Waiting for = %s millis", sleep)
-        # await page.waitFor(sleep)
-        element = await page.querySelector('#form-login-email')
-        await page.screenshot({'path': 'meter1-1.png'})
-        self._LOGGER.debug('meter1-1')
-
-        await page.type("#form-login-email", self.email)
-        await page.type("#form-login-password", self.password)
-        # await page.click("#form-login-remember-me")
-        await page.screenshot({'path': 'meter1-2.png'})
-        await page.click(".submit-button")
-        # # Wait for login to authenticate
-        # sleep = 30000
-        # self._LOGGER.debug("Waiting for = %s millis", sleep)
-        # await page.waitFor(sleep)
-        await fetch_element(page, '.js-login-new-device-form-selector:not(.hidden)')
-        # if mfa_form is None:
-        #     logging.error('Never got MFA prompt. Aborting!')
-        #     return
-        await fetch_element(page, '#form-login-mfa-code')
-        await page.screenshot({'path': 'meter2-1.png'})
-        self._LOGGER.debug('meter2-1')
-
-        # Enter in 2 factor auth code (see README for details)
-        mfa_code = self.mfa_secret
-        if self.mfa_type == self.MFA_TYPE_TOTP:
-            mfa_code = pyotp.TOTP(self.mfa_secret).now()
-        #self._LOGGER.debug("mfa_code = %s", mfa_code)
-        await page.type("#form-login-mfa-code", mfa_code)
-        await page.screenshot({'path': 'meter2-2.png'})
-        #await page.click(".submit-button")
-        await page.click(".js-login-new-device-form .button")
-        await page.screenshot({'path': 'meter-post-mfa.png'})
-        # Wait for authentication to complete
-        # await page.waitForNavigation()
-        sleep = 5000
-        self._LOGGER.debug("Waiting for = %s millis", sleep)
-        await page.waitFor(sleep)
-        # await fetch_element(page, '#mainContent > div > div.dashboard-header-wrapper.coned-tabs--visible.js-module > div.dashboard-header.dashboard-header--oru.content-gutter > div.coned-tabs.js-coned-tabs-dropdown.js-coned-tabs.coned-tabs--oru > div:nth-child(2) > button > span')
-        await page.screenshot({'path': 'meter3-1.png'})
-        self._LOGGER.debug('meter3-1')
-
-        page.on('response', lambda res: asyncio.ensure_future(resp(res, self)))
+        with sync_playwright() as playwright:
+            browser = playwright.chromium.launch()
+            context = browser.new_context(viewport={"width": 1920, "height": 1080})
+            page = context.new_page()
+            page.goto('https://www.' + self.site + '.com/en/login')
+            page.get_by_label("Email Address").fill(self.email)
+            page.get_by_label("Password").fill(self.password)
+            page.screenshot(path="meter1-1.png")
+            self._LOGGER.debug('meter1-1')
+            page.get_by_role("button", name="Log In").click()
+            page.screenshot(path="meter1-2.png")
+            self._LOGGER.debug('meter1-2')
+            mfa_code = self.mfa_secret
+            if self.mfa_type == self.MFA_TYPE_TOTP:
+                mfa_code = pyotp.TOTP(self.mfa_secret).now()
+            page.get_by_label("Enter Code").fill(mfa_code)
+            page.screenshot(path="meter2-1.png")
+            self._LOGGER.debug('meter2-1')
+            page.get_by_label("Enter Code").press("Enter")
 
         if self.account_number:
             account_page_url = 'https://www.' + self.site + '.com/en/accounts-billing/dashboard?account=' + self.account_number
             self._LOGGER.debug(account_page_url)
-            await page.goto(account_page_url)
-            await page.screenshot({'path': 'meter3-0.png'})
+            page.goto(account_page_url)
+            try:
+                page.wait_for_url(account_page_url)
+            except PlaywrightTimeoutError:
+                    print('timeout loading account page use')
+            page.screenshot(path="meter3-0.png")
             self._LOGGER.debug('meter3-0')
-            sleep = 30000
             self._LOGGER.debug("Waiting for = %s millis", sleep)
-            await page.waitFor(sleep)
+
         else:
-            usage_page_url = 'https://www.' + self.site + '.com/en/accounts-billing/dashboard?tab1=billingandusage-1&tab3=sectionRealTimeData-3'
-            self._LOGGER.debug(usage_page_url)
-            await page.goto(usage_page_url, {'waitUntil': 'domcontentloaded', 'timeout': 10000})
-            # await page.waitForNavigation()
-            await page.screenshot({'path': 'meter3-1.png'})
-            self._LOGGER.debug('meter3-1')
-            sleep = 30000
-            self._LOGGER.debug("Waiting for = %s millis", sleep)
-            await page.waitFor(sleep)
+            # look for API response which contains last 24h of meter data
+            with page.expect_response(lambda response: 'cws-real-time-ami-v1' in response.request.url and 'usage' in response.request.url) as response_info:
+                page.get_by_role("link", name="VIEW ENERGY USE").click()
+                try:
+                    page.wait_for_url("https://www.' + self.site + '.com/en/accounts-billing/my-account/energy-use")
+                except PlaywrightTimeoutError:
+                    print('timeout loading energy use')
+                    self._LOGGER.error('timeout waiting for response')
 
-        # # Access the API using your newly acquired authentication cookies!
-        # # api_page = await browser.newPage()
-        # api_url = 'https://' + self.data_site + '.opower.com/ei/edge/apis/cws-real-time-ami-v1/cws/' + self.data_site + '/accounts/' + self.account_uuid + '/meters/' + self.meter_number + '/usage'
-        # await page.goto(api_url)
-        # await page.screenshot({'path': 'meter4-1.png'})
-        self._LOGGER.debug('meter4-1')
+                #try to ensure that the chart loads, which will guarantee we have the API response
+                # expect(page.get_by_text("li:has-text('Weather (°F)')")).to_be_visible()
+                # page.wait_for_load_state('domcontentloaded')
+                page.locator("li:has-text(\"Electricity Use\")").click()
+                page.screenshot(path="meter3-1.png")
+                self._LOGGER.debug('meter3-1')
+            raw_data = response_info.value.text()
+            self._LOGGER.debug(f"raw_data = {raw_data}")
+            context.close()
+            browser.close()
+            return raw_data
 
-        self._LOGGER.debug(f"raw_data = {raw_data}")
-
-        self.raw_data = raw_data
-
-        # data_elem = await page.querySelector('pre')
-        # self.raw_data = await page.evaluate('(el) => el.textContent', data_elem)
-        #self._LOGGER.info(self.raw_data)
-
-        await browser.close()
-
-
-async def resp(res, meter):
-    res.__setattr__('_allowInterception', True)
-    if 'cws-real-time-ami-v1' in res.url and 'usage' in res.url:
-        print(f"  res.url: {res.url}")
-        print(f"  res.status: {res.status}")
-        global raw_data
-        raw_data = await res.text()
-        meter._LOGGER.debug(f"  res.text: {raw_data}")
-    pass
-
-
-async def fetch_element(page, selector, max_tries=10):
-    tries = 0
-    el = None
-    while el == None and tries < max_tries:
-        el = await page.querySelector(selector)
-        await page.waitFor(1000)
-
-    return el
+# def intercept_response(response):
+#     global raw_data
+#     if 'cws-real-time-ami-v1' in response.request.url and 'usage' in response.request.url:
+#         print(f"  response.url: {response.url}")
+#         print(f"  response.status: {response.status}")
+#         print(response.text())
+#         raw_data = response.text()

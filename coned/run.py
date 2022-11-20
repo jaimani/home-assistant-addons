@@ -1,5 +1,5 @@
 import os
-import asyncio
+import nest_asyncio
 from coned import Meter
 from coned import MeterError
 import paho.mqtt.client as mqtt
@@ -7,8 +7,6 @@ import json
 import logging
 import time
 from datetime import datetime
-
-
 
 print(f"Creating Meter")
 
@@ -20,13 +18,12 @@ meter = Meter(
     account_uuid=os.getenv("ACCOUNT_UUID"),
     meter_number=os.getenv("METER_NUMBER"),
     site=os.getenv("SITE"),
-    browser_path="/usr/bin/chromium-browser"
-    #browser_path="/usr/local/bin/chromium"
 )
 # meter._LOGGER.setLevel(logging.DEBUG)
 
 print(f"Calling meter.last_read()..")
-startTime, endTime, value, uom = asyncio.get_event_loop().run_until_complete(meter.last_read())
+nest_asyncio.apply()
+startTime, endTime, value, uom = meter.last_read()
 asOf = datetime.now().isoformat()
 message = {'startTime': startTime, 'endTime': endTime, 'value': value, 'uom': uom, 'asOf': asOf}
 
@@ -38,7 +35,7 @@ mqttpass = os.getenv("MQTT_PASS")
 
 print(f"Connecting to mqtt {mqtthost} as {mqttuser}")
 
-mqttc = mqtt.Client("oru_meter_reader")
+mqttc = mqtt.Client("coned_meter_reader")
 mqttc.username_pw_set(username=mqttuser, password=mqttpass)
 mqttc.connect(mqtthost)
 
