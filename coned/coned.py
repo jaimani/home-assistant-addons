@@ -166,13 +166,9 @@ class Meter(object):
                 #try to ensure that the chart loads, which will guarantee we have the API response
                 # expect(page.get_by_text("li:has-text('Weather (°F)')")).to_be_visible()
                 try:
-                    selector = f'li:has-text("Weather (°F)")")'
-                    pre = page.wait_for_selector(selector)
-                    pre.click()
-                    print("waiting successful!")
+                    page.wait_for_load_state('domcontentloaded')
                 except PlaywrightTimeoutError:
                     self._LOGGER.info('timeout waiting for chart to load')
-                # page.wait_for_load_state('domcontentloaded')
                 # page.locator("li:has-text(\"Electricity Use\")").click()
                 page.screenshot(path="meter3-1.png")
                 self._LOGGER.debug('meter3-1')
