@@ -134,6 +134,7 @@ class Meter(object):
                 self._LOGGER.debug("Error while deleting file : ", filePath)
 
         with sync_playwright() as playwright:
+            # browser = playwright.chromium.launch(headless=False)
             browser = playwright.chromium.launch()
             context = browser.new_context(viewport={"width": 1920, "height": 1080})
             page = context.new_page()
@@ -153,19 +154,6 @@ class Meter(object):
             self._LOGGER.debug('meter2-1')
             page.get_by_label("Enter Code").press("Enter")
 
-        if self.account_number:
-            account_page_url = 'https://www.' + self.site + '.com/en/accounts-billing/dashboard?account=' + self.account_number
-            self._LOGGER.debug(account_page_url)
-            page.goto(account_page_url)
-            try:
-                page.wait_for_url(account_page_url)
-            except PlaywrightTimeoutError:
-                    print('timeout loading account page use')
-            page.screenshot(path="meter3-0.png")
-            self._LOGGER.debug('meter3-0')
-            self._LOGGER.debug("Waiting for = %s millis", sleep)
-
-        else:
             # look for API response which contains last 24h of meter data
             with page.expect_response(lambda response: 'cws-real-time-ami-v1' in response.request.url and 'usage' in response.request.url) as response_info:
                 page.get_by_role("link", name="VIEW ENERGY USE").click()
@@ -177,8 +165,15 @@ class Meter(object):
 
                 #try to ensure that the chart loads, which will guarantee we have the API response
                 # expect(page.get_by_text("li:has-text('Weather (°F)')")).to_be_visible()
+                try:
+                    selector = f'li:has-text("Weather (°F)")")'
+                    pre = page.wait_for_selector(selector)
+                    pre.click()
+                    print("waiting successful!")
+                except PlaywrightTimeoutError:
+                    self._LOGGER.info('timeout waiting for chart to load')
                 # page.wait_for_load_state('domcontentloaded')
-                page.locator("li:has-text(\"Electricity Use\")").click()
+                # page.locator("li:has-text(\"Electricity Use\")").click()
                 page.screenshot(path="meter3-1.png")
                 self._LOGGER.debug('meter3-1')
             raw_data = response_info.value.text()
