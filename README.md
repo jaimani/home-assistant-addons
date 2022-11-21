@@ -6,7 +6,7 @@ Home Assistant allows anyone to create add-on repositories to share their
 add-ons for Home Assistant easily. This repository is one of those repositories,
 providing extra Home Assistant add-ons for your installation.
 
-Add-on documentation: <https://developers.home-assistant.io/docs/add-ons>
+Add-on developer documentation: <https://developers.home-assistant.io/docs/add-ons>
 
 ## Installation
 
@@ -45,21 +45,6 @@ Notes to developers after forking or using the github template feature:
 - Share your repository on the forums https://community.home-assistant.io/c/projects/9
 - Do awesome stuff!
  -->
-
-## Support
-
-Got questions?
-
-You have several options to get them answered:
-
-- The Home Assistant Community Add-ons [Discord Chat Server][discord]
-- The Home Assistant [Community Forum][forum].
-- The Home Assistant [Discord Chat Server][discord-ha].
-- Join the [Reddit subreddit][reddit] in [/r/homeassistant][reddit]
-
-You could also open an issue here on GitHub. Note, we use a separate
-GitHub repository for each add-on. Please ensure you are creating the issue
-on the correct GitHub repository matching the add-on.
 
 ## License
 
